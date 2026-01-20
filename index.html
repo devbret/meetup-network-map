@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="https://hosting.photobucket.com/bbcfb0d4-be20-44a0-94dc-65bff8947cf2/ff4a3384-baa9-4bc2-94c9-6bff4e3d3ea0.png"
+      type="image/x-icon"
+    />
+    <title>Meetup Pro Network Map - Bret Bernhoft</title>
+    <meta
+      name="description"
+      content="Visualizes the locations of members from a Meetup network by adding individual points to convey growth at a glance."
+    />
+    <meta name="author" content="Bret Bernhoft" />
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+    <link rel="stylesheet" href="main.css" />
+  </head>
+
+  <body>
+    <div id="map"></div>
+
+    <div class="hud">
+      <h1>Meetup Pro Network Map</h1>
+      <sub class="sub">
+        <p>
+          Visualizes the locations of members from a Meetup network by adding
+          individual points to convey growth at a glance.
+        </p>
+      </sub>
+
+      <div class="row">
+        <label class="pill" title="Show individual points">
+          <input id="togglePoints" type="checkbox" checked />
+          Points
+        </label>
+
+        <label class="pill" title="Show heat layer">
+          <input id="toggleHeat" type="checkbox" checked />
+          Heatmap
+        </label>
+      </div>
+
+      <div class="row" style="margin-top: 8px">
+        <label class="pill" title="Point radius">
+          Point
+          <input
+            id="pointRadius"
+            type="range"
+            min="2"
+            max="10"
+            step="1"
+            value="4"
+          />
+        </label>
+
+        <label class="pill" title="Heat radius">
+          Heat
+          <input
+            id="heatRadius"
+            type="range"
+            min="10"
+            max="60"
+            step="1"
+            value="28"
+          />
+        </label>
+
+        <label class="pill" title="Heat blur">
+          Blur
+          <input
+            id="heatBlur"
+            type="range"
+            min="5"
+            max="45"
+            step="1"
+            value="20"
+          />
+        </label>
+      </div>
+
+      <div id="stat" class="stat">Loading…</div>
+      <div id="err" class="error" style="display: none"></div>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+    <script src="main.js"></script>
+  </body>
+</html>
