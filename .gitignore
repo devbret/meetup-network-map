@@ -1,5 +1,4 @@
 .vscode/
 venv/
-out/
+out/*.json
 *.csv
-*.json

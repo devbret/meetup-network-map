@@ -173,7 +173,6 @@ def convert_meetup_csv_to_leaflet_json(
 
     return meta
 
-
 if __name__ == "__main__":
     import argparse
 
