@@ -1,10 +1,10 @@
 # Meetup Pro Network Map
 
-![Visualizes the locations of members from a Meetup network by adding individual points to convey growth at a glance.](https://hosting.photobucket.com/bbcfb0d4-be20-44a0-94dc-65bff8947cf2/e3d2e510-2543-4e33-8082-6966f0eee3bf.png)
+![Screenshot of the world map UI featuring bright blue dots on a dark background.](https://hosting.photobucket.com/bbcfb0d4-be20-44a0-94dc-65bff8947cf2/e3d2e510-2543-4e33-8082-6966f0eee3bf.png)
 
-Visualizes the locations of members from a Meetup network by adding individual points to convey growth at a glance.
+Visualize Meetup member locations as individual map points and heatmap layers, making it easy to see geographic reach, engagement and growth patterns at a glance.
 
-## Overview
+## Application Overview
 
 Displays the geographic footprint of a Meetup network using an interactive map built with Leaflet. Member location data is processed offline from a CSV export into aggregated latitude/longitude points.
 
@@ -12,9 +12,9 @@ The frontend renders these points as individual markers and a heat layer. A head
 
 A Python script converts raw Meetup CSV data into JSON outputs for the web map. These values are consumed by the JavaScript to (re)build point and heat layers. The result is a clean, performant visualization suitable for showcasing network reach, engagement and community growth at a glance.
 
-## Set Up Instructions
+## Basic Setup Instructions
 
-Below are the required software programs and instructions for installing and using this application.
+Below are the required software programs and instructions for installing and using this application on a Linux machine.
 
 ### Programs Needed
 
@@ -28,34 +28,40 @@ Below are the required software programs and instructions for installing and usi
 
 2. Open a terminal
 
-3. Clone this repository using `git` by running the following command: `git clone git@github.com:devbret/meetup-network-map.git`
+3. Clone this repository: `git clone git@github.com:devbret/meetup-network-map.git`
 
-4. Navigate to the repo's directory by running: `cd meetup-network-map`
+4. Navigate to the repo's directory: `cd meetup-network-map`
 
-5. Create a virtual environment with this command: `python3 -m venv venv`
+5. Create a virtual environment: `python3 -m venv venv`
 
-6. Activate your virtual environment using: `source venv/bin/activate`
+6. Activate your virtual environment: `source venv/bin/activate`
 
 7. Download member data from your network(s) in the Meetup Organizer dashboard as a CSV file
 
-8. Rename the file: `members.csv`
+8. Rename the downloaded CSV file: `members.csv`
 
 9. Place the `members.csv` file at this repo's root directory
 
-10. Run the Python script with the following command: `python3 app.py members.csv --out ./out`
+10. Run the Python script: `python3 app.py members.csv --out ./out`
 
-11. Use the following command to launch a frontend web server: `python3 -m http.server`
+11. Launch an HTTP server: `python3 -m http.server`
 
-12. Access the user interface in a browser by visiting: `http://localhost:8000`
+12. Access the user interface in a browser: `http://localhost:8000`
 
-13. To exit the virtual environment, type this command in the terminal: `deactivate`
+13. When finished, close the HTTP server: `CTRL + c`
+
+14. Exit the virtual environment: `deactivate`
 
 ## Other Considerations
 
 This project repo is intended to demonstrate an ability to do the following:
 
-- Convert a CSV file exported from Meetup into structured JSON optimized for map visualization
+- Convert Meetup member CSV data into geographic JSON files for map visualization
 
-- Process geographic and activity data to calculate engagement weights and recency scores
+- Plot member locations on an interactive map using circle markers and a heatmap layer
+
+- Aggregate coordinates, calculate engagement weight and derive recency from last access time
+
+- Enable users to toggle points, adjust heatmap settings and view basic location statistics
 
 If you have any questions or would like to collaborate, please reach out either on GitHub or via [my website](https://bretbernhoft.com/).
