@@ -22,7 +22,7 @@ Below are the required software programs and instructions for installing and usi
 
 - [Python](https://www.python.org/downloads/)
 
-### Steps For Use
+### Setup Steps
 
 1. Install the above programs
 
@@ -54,6 +54,10 @@ Below are the required software programs and instructions for installing and usi
 
 ## Other Considerations
 
+This section completes documentation with context beyond setup and usage, by highlighting the technical skills this project showcases; from data processing to interactive visualization features. As well, information about the terms which this code is licensed under and how to get in touch with the author can be found below.
+
+### Abilities Demonstrated
+
 This project repo is intended to demonstrate an ability to do the following:
 
 - Convert Meetup member CSV data into geographic JSON files for map visualization
@@ -63,5 +67,9 @@ This project repo is intended to demonstrate an ability to do the following:
 - Aggregate coordinates, calculate engagement weight and derive recency from last access time
 
 - Enable users to toggle points, adjust heatmap settings and view basic location statistics
+
+### License Information
+
+This project is licensed under the MIT License, a permissive open-source license allowing anyone to use, copy, modify, merge, publish, distribute, sublicense and even sell copies of the software with minimal restrictions. The only requirement is the original copyright notice and license text be included in any substantial portion of software being redistributed. The software is provided "as is", without warranty of any kind, meaning the author is not liable for any claims, damages or other issues arising from its use. See the [LICENSE](./LICENSE) file for the full text.
 
 If you have any questions or would like to collaborate, please reach out either on GitHub or via [my website](https://bretbernhoft.com/).
