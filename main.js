@@ -3,8 +3,8 @@ const POINTS_URL = "./out/members_points.json";
 const statEl = document.getElementById("stat");
 const errEl = document.getElementById("err");
 
+const kpiMembers = document.getElementById("kpiMembers");
 const kpiLocations = document.getElementById("kpiLocations");
-const kpiHeatMode = document.getElementById("kpiHeatMode");
 const kpiView = document.getElementById("kpiView");
 
 const map = L.map("map", { zoomControl: true, worldCopyJump: true }).setView(
@@ -12,9 +12,10 @@ const map = L.map("map", { zoomControl: true, worldCopyJump: true }).setView(
   2,
 );
 
-L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-  attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
-  maxZoom: 20,
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  maxZoom: 19,
 }).addTo(map);
 
 const pointsLayer = L.layerGroup().addTo(map);
@@ -26,6 +27,15 @@ const pointRadius = document.getElementById("pointRadius");
 const heatRadius = document.getElementById("heatRadius");
 const heatBlur = document.getElementById("heatBlur");
 const btnRefit = document.getElementById("btnRefit");
+
+const growthRow = document.getElementById("growthRow");
+const joinCutoff = document.getElementById("joinCutoff");
+const joinCutoffLabel = document.getElementById("joinCutoffLabel");
+const btnPlay = document.getElementById("btnPlay");
+
+let allPoints = [];
+let joinDays = [];
+let playTimer = null;
 
 function showError(msg) {
   errEl.style.display = "block";
@@ -47,9 +57,53 @@ function normalizePoints(raw) {
     if (lat < -90 || lat > 90 || lon < -180 || lon > 180) continue;
     const count = Number(p?.count);
     const w = Number.isFinite(count) ? count : 1;
-    out.push({ lat, lon, w });
+    const joins = Array.isArray(p?.joins)
+      ? p.joins.filter((d) => typeof d === "string").sort()
+      : [];
+    const unknown = Math.max(0, w - joins.length);
+    out.push({ lat, lon, w, joins, unknown });
   }
   return out;
+}
+
+function collectJoinDays(points) {
+  const days = new Set();
+  for (const p of points) for (const d of p.joins) days.add(d);
+  return [...days].sort();
+}
+
+function pointsJoinedBy(points, cutoffDay) {
+  if (cutoffDay === null) return points;
+  const out = [];
+  for (const p of points) {
+    let n = p.unknown;
+    for (const d of p.joins) {
+      if (d > cutoffDay) break;
+      n++;
+    }
+    if (n > 0) out.push({ lat: p.lat, lon: p.lon, w: n });
+  }
+  return out;
+}
+
+function currentCutoffDay() {
+  if (!joinDays.length) return null;
+  const i = Math.min(
+    joinDays.length - 1,
+    Math.max(0, Number(joinCutoff.value)),
+  );
+  return joinDays[i];
+}
+
+function formatDay(day) {
+  const d = new Date(`${day}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return day;
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 }
 
 function buildPoints(points) {
@@ -111,19 +165,76 @@ function updateLayerVisibility() {
           : "Hidden";
 
   if (kpiView) kpiView.textContent = view;
-  if (kpiHeatMode) kpiHeatMode.textContent = "Count";
 }
 
-function updateStats(points) {
-  statEl.textContent = ``;
+function updateKpis(points) {
+  const members = points.reduce((sum, p) => sum + p.w, 0);
+  if (kpiMembers) kpiMembers.textContent = String(members);
   if (kpiLocations) kpiLocations.textContent = String(points.length);
+
+  const day = currentCutoffDay();
+  if (joinCutoffLabel) joinCutoffLabel.textContent = day ? formatDay(day) : "";
 }
 
-function rebuildFromMemory() {
-  if (!window.__points) return;
-  buildPoints(window.__points);
-  buildHeat(window.__points);
+function updateSummary() {
+  const members = allPoints.reduce((sum, p) => sum + p.w, 0);
+  const parts = [`${members} members`, `${allPoints.length} locations`];
+  if (joinDays.length) {
+    const first = formatDay(joinDays[0]);
+    const last = formatDay(joinDays[joinDays.length - 1]);
+    parts.push(
+      first === last ? `joined ${first}` : `joined ${first} to ${last}`,
+    );
+  }
+  statEl.textContent = parts.join(" · ");
+}
+
+function setupGrowthSlider() {
+  joinDays = collectJoinDays(allPoints);
+  if (!growthRow || !joinCutoff) return;
+
+  if (!joinDays.length) {
+    growthRow.hidden = true;
+    return;
+  }
+
+  growthRow.hidden = false;
+  joinCutoff.min = "0";
+  joinCutoff.max = String(joinDays.length - 1);
+  joinCutoff.value = String(joinDays.length - 1);
+}
+
+function render() {
+  const points = pointsJoinedBy(allPoints, currentCutoffDay());
+  buildPoints(points);
+  buildHeat(points);
   updateLayerVisibility();
+  updateKpis(points);
+}
+
+function stopPlay() {
+  if (playTimer) {
+    clearInterval(playTimer);
+    playTimer = null;
+  }
+  if (btnPlay) btnPlay.textContent = "Play";
+}
+
+function startPlay() {
+  if (!joinDays.length) return;
+  const last = joinDays.length - 1;
+  if (Number(joinCutoff.value) >= last) joinCutoff.value = "0";
+  render();
+
+  const interval = Math.max(40, Math.min(400, 6000 / joinDays.length));
+
+  if (btnPlay) btnPlay.textContent = "Pause";
+  playTimer = setInterval(() => {
+    const next = Number(joinCutoff.value) + 1;
+    joinCutoff.value = String(next);
+    render();
+    if (next >= last) stopPlay();
+  }, interval);
 }
 
 async function main() {
@@ -135,15 +246,12 @@ async function main() {
     if (!res.ok) throw new Error(`Failed to fetch ${POINTS_URL}`);
 
     const raw = await res.json();
-    const points = normalizePoints(raw);
+    allPoints = normalizePoints(raw);
 
-    window.__points = points;
-
-    buildPoints(points);
-    buildHeat(points);
-    updateLayerVisibility();
-    refitBounds(points);
-    updateStats(points);
+    setupGrowthSlider();
+    render();
+    refitBounds(allPoints);
+    updateSummary();
   } catch (err) {
     console.error(err);
     showError(String(err));
@@ -151,17 +259,28 @@ async function main() {
   }
 }
 
-pointRadius.addEventListener("input", rebuildFromMemory);
-heatRadius.addEventListener("input", rebuildFromMemory);
-heatBlur.addEventListener("input", rebuildFromMemory);
+pointRadius.addEventListener("input", render);
+heatRadius.addEventListener("input", render);
+heatBlur.addEventListener("input", render);
 
 togglePoints.addEventListener("change", updateLayerVisibility);
 toggleHeat.addEventListener("change", updateLayerVisibility);
 
 if (btnRefit) {
-  btnRefit.addEventListener("click", () => {
-    if (window.__points) refitBounds(window.__points);
+  btnRefit.addEventListener("click", () => refitBounds(allPoints));
+}
+
+if (joinCutoff) {
+  joinCutoff.addEventListener("input", () => {
+    stopPlay();
+    render();
   });
+}
+
+if (btnPlay) {
+  btnPlay.addEventListener("click", () =>
+    playTimer ? stopPlay() : startPlay(),
+  );
 }
 
 main();

@@ -40,6 +40,10 @@
 
         <div class="kpis">
           <div class="kpi">
+            <div class="kpi-label">Members</div>
+            <div class="kpi-value" id="kpiMembers">—</div>
+          </div>
+          <div class="kpi">
             <div class="kpi-label">Locations</div>
             <div class="kpi-value" id="kpiLocations">—</div>
           </div>
@@ -101,6 +105,30 @@
               value="20"
             />
           </label>
+        </div>
+
+        <div class="growth" id="growthRow" hidden>
+          <div class="growth-head">
+            <label for="joinCutoff">
+              Joined by <output id="joinCutoffLabel" for="joinCutoff">—</output>
+            </label>
+            <button
+              class="chip btn chip-sm"
+              id="btnPlay"
+              type="button"
+              title="Replay network growth"
+            >
+              Play
+            </button>
+          </div>
+          <input
+            id="joinCutoff"
+            type="range"
+            min="0"
+            max="0"
+            step="1"
+            value="0"
+          />
         </div>
 
         <div class="status">
